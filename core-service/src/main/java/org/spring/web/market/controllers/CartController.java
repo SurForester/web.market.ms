@@ -27,4 +27,5 @@ public class CartController {
         model.addAttribute("cart", cart);
         return "cart-page";
     }
+
 }
