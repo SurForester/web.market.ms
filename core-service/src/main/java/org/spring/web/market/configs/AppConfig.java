@@ -1,6 +1,7 @@
 package org.spring.web.market.configs;
 
 import org.springframework.context.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -16,9 +17,14 @@ import java.util.Locale;
 @ComponentScan("org.spring.web.market")
 public class AppConfig implements WebMvcConfigurer {
 
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        if (!registry.hasMappingForPattern("/images/**")) {
-            registry.addResourceHandler("/images/**").addResourceLocations("file:images/");
+        if (!registry.hasMappingForPattern("/static/images/**")) {
+            registry.addResourceHandler("/static/images/**").addResourceLocations("file:static/images/");
         }
     }
 

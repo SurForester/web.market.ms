@@ -1,8 +1,10 @@
 package org.spring.web.market.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.spring.web.market.api.dto.CartDTO;
-import org.spring.web.market.services.ShoppingCartService;
-import org.spring.web.market.utils.ShoppingCart;
+import org.spring.web.market.integrations.CartServiceIntegration;
+//import org.spring.web.market.services.ShoppingCartService;
+//import org.spring.web.market.utils.ShoppingCart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,18 +15,15 @@ import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/cart")
+@RequiredArgsConstructor
 public class CartController {
-    private ShoppingCartService shoppingCartService;
-
-    @Autowired
-    public void setShoppingCartService(ShoppingCartService shoppingCartService) {
-        this.shoppingCartService = shoppingCartService;
-    }
+    private final CartServiceIntegration cartServiceIntegration;
 
     @GetMapping
     public String cartPage(Model model, HttpSession httpSession) {
-        CartDTO cart = shoppingCartService.getCurrentCart(httpSession);
+        CartDTO cart = cartServiceIntegration.getCart(httpSession);
         model.addAttribute("cart", cart);
         return "cart-page";
     }
+
 }

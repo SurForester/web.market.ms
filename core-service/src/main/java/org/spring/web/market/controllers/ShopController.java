@@ -1,12 +1,14 @@
 package org.spring.web.market.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.spring.web.market.entities.Order;
 import org.spring.web.market.entities.Product;
 import org.spring.web.market.entities.User;
+import org.spring.web.market.integrations.CartServiceIntegration;
 import org.spring.web.market.repositories.specifications.ProductSpecs;
 import org.spring.web.market.services.OrderService;
 import org.spring.web.market.services.ProductService;
-import org.spring.web.market.services.ShoppingCartService;
+//import org.spring.web.market.services.ShoppingCartService;
 import org.spring.web.market.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,7 +24,9 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/shop")
+@RequiredArgsConstructor
 public class ShopController {
+    private final CartServiceIntegration cartServiceIntegration;
     private static final int INITIAL_PAGE = 0;
     private static final int PAGE_SIZE = 10;
 
@@ -30,17 +34,10 @@ public class ShopController {
     private UserService userService;
     private OrderService orderService;
     private ProductService productService;
-    private ShoppingCartService shoppingCartService;
-//    private DeliveryAddressService deliverAddressService;
 
     @Autowired
     public void setProductService(ProductService productService) {
         this.productService = productService;
-    }
-
-    @Autowired
-    public void setShoppingCartService(ShoppingCartService shoppingCartService) {
-        this.shoppingCartService = shoppingCartService;
     }
 
     @Autowired
@@ -106,21 +103,8 @@ public class ShopController {
 
     @GetMapping("/cart/add/{id}")
     public String addProductToCart(Model model, @PathVariable("id") Long id, HttpServletRequest httpServletRequest) {
-        shoppingCartService.addToCart(httpServletRequest.getSession(), id);
+        cartServiceIntegration.addProductToCart(httpServletRequest.getSession(), id);
         String referrer = httpServletRequest.getHeader("referer");
-
-//        ConnectionFactory factory = new ConnectionFactory();
-//        factory.setHost("localhost");
-//        try (Connection connection = factory.newConnection();
-//             Channel channel = connection.createChannel()){
-//            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-//            String msg = "Hello World!";
-//            channel.basicPublish("", QUEUE_NAME, null, msg.getBytes());
-//            System.out.println("sent " + msg);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
         return "redirect:" + referrer;
     }
 
@@ -130,7 +114,8 @@ public class ShopController {
             return "redirect:/login";
         }
         User user = userService.findByUserName(principal.getName());
-        Order order = orderService.makeOrder(shoppingCartService.getCurrentCart(httpServletRequest.getSession()), user);
+        Order order = orderService.makeOrder(cartServiceIntegration.getCart(httpServletRequest.getSession()), user);
+        cartServiceIntegration.clearCart();
         order.setDeliveryAddress(orderFromFrontend.getDeliveryAddress());
         order.setDeliveryDate(LocalDateTime.now().plusDays(7));
         order.setDeliveryPrice(0.0);
