@@ -36,7 +36,17 @@ public class OrderService {
         order.setUser(user);
         order.setStatus(orderStatusService.getStatusById(1L));
         order.setPrice(cart.getTotalCost());
-        order.setOrderItems(new ArrayList<>(cart.getItems()));
+        var orderItems = new ArrayList<OrderItem>();
+        for (CartItemDTO cartItemDto : cart.getItems()) {
+            var oi = new OrderItem();
+            oi.setOrder(order);
+            oi.setId(cartItemDto.getId());
+            oi.setProduct(cartItemDto.getProduct());
+            oi.setQuantity(cartItemDto.getQuantity());
+            oi.setItemPrice(cartItemDto.getItemPrice());
+            oi.setTotalPrice(cartItemDto.getTotalPrice());
+        }
+        order.setOrderItems(orderItems);
         return order;
     }
 
