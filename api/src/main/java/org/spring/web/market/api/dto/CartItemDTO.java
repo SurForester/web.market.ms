@@ -1,11 +1,13 @@
 package org.spring.web.market.api.dto;
 
+import java.math.BigDecimal;
+
 public class CartItemDTO {
 
     private Long id;
     private Long quantity;
-    private Double itemPrice;
-    private Double totalPrice;
+    private BigDecimal itemPrice;
+    private BigDecimal totalPrice;
     private ProductDTO product;
 
     public Long getId() {
@@ -24,19 +26,19 @@ public class CartItemDTO {
         this.quantity = quantity;
     }
 
-    public Double getItemPrice() {
+    public BigDecimal getItemPrice() {
         return itemPrice;
     }
 
-    public void setItemPrice(Double itemPrice) {
+    public void setItemPrice(BigDecimal itemPrice) {
         this.itemPrice = itemPrice;
     }
 
-    public Double getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
+    public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
 

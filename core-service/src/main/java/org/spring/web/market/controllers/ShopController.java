@@ -8,7 +8,6 @@ import org.spring.web.market.integrations.CartServiceIntegration;
 import org.spring.web.market.repositories.specifications.ProductSpecs;
 import org.spring.web.market.services.OrderService;
 import org.spring.web.market.services.ProductService;
-//import org.spring.web.market.services.ShoppingCartService;
 import org.spring.web.market.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -28,9 +28,9 @@ import java.util.Optional;
 public class ShopController {
     private final CartServiceIntegration cartServiceIntegration;
     private static final int INITIAL_PAGE = 0;
-    private static final int PAGE_SIZE = 10;
+    private int PAGE_SIZE = 10;
 
-//    private MailService mailService;
+    //    private MailService mailService;
     private UserService userService;
     private OrderService orderService;
     private ProductService productService;
@@ -65,7 +65,8 @@ public class ShopController {
                            @RequestParam(value = "page") Optional<Integer> page,
                            @RequestParam(value = "word", required = false) String word,
                            @RequestParam(value = "min", required = false) Double min,
-                           @RequestParam(value = "max", required = false) Double max
+                           @RequestParam(value = "max", required = false) Double max,
+                           @RequestParam(value = "lines", required = false) Integer lines
     ) {
         final int currentPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
 
@@ -73,18 +74,23 @@ public class ShopController {
         StringBuilder filters = new StringBuilder();
         if (word != null) {
             spec = spec.and(ProductSpecs.titleContains(word));
-            filters.append("&word=" + word);
+            filters.append("&word=").append(word);
         }
         if (min != null) {
             spec = spec.and(ProductSpecs.priceGreaterThanOrEq(min));
-            filters.append("&min=" + min);
+            filters.append("&min=").append(min);
         }
         if (max != null) {
             spec = spec.and(ProductSpecs.priceLesserThanOrEq(max));
-            filters.append("&max=" + max);
+            filters.append("&max=").append(max);
+        }
+        if (lines == null) {
+            lines = PAGE_SIZE;
+        } else if (PAGE_SIZE != lines) {
+            PAGE_SIZE = lines;
         }
 
-        Page<Product> products = productService.getProductsWithPagingAndFiltering(currentPage, PAGE_SIZE, spec);
+            Page<Product> products = productService.getProductsWithPagingAndFiltering(currentPage, PAGE_SIZE, spec);
 
         model.addAttribute("products", products.getContent());
         model.addAttribute("page", currentPage);
@@ -95,30 +101,29 @@ public class ShopController {
         model.addAttribute("min", min);
         model.addAttribute("max", max);
         model.addAttribute("word", word);
+        model.addAttribute("lines", lines);
 
         return "shop-page";
     }
 
-    private final static String QUEUE_NAME = "hello";
+//    private final static String QUEUE_NAME = "hello";
 
     @GetMapping("/cart/add/{id}")
-    public String addProductToCart(Model model, @PathVariable("id") Long id, HttpServletRequest httpServletRequest) {
+    public void addProductToCart(@PathVariable("id") Long id, HttpServletRequest httpServletRequest) {
         cartServiceIntegration.addProductToCart(httpServletRequest.getSession(), id);
-        String referrer = httpServletRequest.getHeader("referer");
-        return "redirect:" + referrer;
     }
 
     @PostMapping("/order/confirm")
-    public String orderConfirm(Model model, HttpServletRequest httpServletRequest, @ModelAttribute(name = "order") Order orderFromFrontend, Principal principal) {
+    public String orderConfirm(Model model, @ModelAttribute(name = "order") Order orderFromFrontend, Principal principal) {
         if (principal == null) {
             return "redirect:/login";
         }
         User user = userService.findByUserName(principal.getName());
         Order order = orderService.makeOrder(cartServiceIntegration.getCart(httpServletRequest.getSession()), user);
-        cartServiceIntegration.clearCart();
+        cartServiceIntegration.clearCart(httpServletRequest.getSession());
         order.setDeliveryAddress(orderFromFrontend.getDeliveryAddress());
         order.setDeliveryDate(LocalDateTime.now().plusDays(7));
-        order.setDeliveryPrice(0.0);
+        order.setDeliveryPrice(BigDecimal.ZERO);
         order = orderService.saveOrder(order);
         model.addAttribute("order", order);
         return "order-filler";

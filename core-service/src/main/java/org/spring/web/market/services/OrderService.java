@@ -2,6 +2,7 @@ package org.spring.web.market.services;
 
 import org.spring.web.market.api.dto.CartDTO;
 import org.spring.web.market.api.dto.CartItemDTO;
+import org.spring.web.market.converters.ProductDTOConverter;
 import org.spring.web.market.entities.Order;
 import org.spring.web.market.entities.OrderItem;
 import org.spring.web.market.entities.User;
@@ -16,8 +17,13 @@ import java.util.List;
 @Service
 public class OrderService {
     private OrderRepository orderRepository;
-
     private OrderStatusService orderStatusService;
+    private ProductDTOConverter productDTOConverter;
+
+    @Autowired
+    public void setProductFromDTOConverter(ProductDTOConverter productDTOConverter) {
+        this.productDTOConverter = productDTOConverter;
+    }
 
     @Autowired
     public void setOrderRepository(OrderRepository orderRepository) {
@@ -41,7 +47,7 @@ public class OrderService {
             var oi = new OrderItem();
             oi.setOrder(order);
             oi.setId(cartItemDto.getId());
-            oi.setProduct(cartItemDto.getProduct());
+            oi.setProduct(productDTOConverter.modelProductDTOToItem(cartItemDto.getProduct()));
             oi.setQuantity(cartItemDto.getQuantity());
             oi.setItemPrice(cartItemDto.getItemPrice());
             oi.setTotalPrice(cartItemDto.getTotalPrice());

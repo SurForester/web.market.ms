@@ -2,7 +2,6 @@ package org.spring.web.market.cart.converters;
 
 import lombok.RequiredArgsConstructor;
 import org.spring.web.market.api.dto.CartDTO;
-import org.spring.web.market.api.dto.CartItemDTO;
 import org.spring.web.market.cart.entities.Cart;
 import org.springframework.stereotype.Component;
 
