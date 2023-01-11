@@ -18,9 +18,10 @@ public class CartServiceIntegration {
 
     private final WebClient cartServiceWebClient;
 
-    public CartDTO getCurrentCart() {
+    public CartDTO getCart(String user) {
         return cartServiceWebClient.get()
-                .uri("api/v1/cart")
+                .uri("cart/")
+                .attribute("user", user)
                 .retrieve()
                 .onStatus(
                         httpStatus -> httpStatus.value() == HttpStatus.NOT_FOUND.value(),
@@ -30,4 +31,29 @@ public class CartServiceIntegration {
                 .block();
     }
 
+    public void addToCart(Long productId, String user) {
+        cartServiceWebClient.get()
+                .uri("cart/add/" + productId)
+                .attribute("user", user)
+                .retrieve()
+                .onStatus(
+                        httpStatus -> httpStatus.value() == HttpStatus.NOT_FOUND.value(),
+                        clientResponse -> Mono.error(new ResourceNotFoundException("Корзина не найдена в продуктовом MS"))
+                )
+                .toBodilessEntity()
+                .block();
+    }
+
+    public void clearCart(String user) {
+        cartServiceWebClient.get()
+                .uri("cart/clear")
+                .attribute("user", user)
+                .retrieve()
+                .onStatus(
+                        httpStatus -> httpStatus.value() == HttpStatus.NOT_FOUND.value(),
+                        clientResponse -> Mono.error(new ResourceNotFoundException("Корзина не найдена в продуктовом MS"))
+                )
+                .toBodilessEntity()
+                .block();
+    }
 }

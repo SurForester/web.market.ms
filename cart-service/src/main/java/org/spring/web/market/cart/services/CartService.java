@@ -12,13 +12,11 @@ import java.util.HashMap;
 
 @Service
 public class CartService {
-    //private HashMap<String, Cart> cartList;
-    private Cart cart;
+    private HashMap<String, Cart> cartList;
     private ProductServiceIntegration productServiceIntegration;
 
     public CartService() {
-        //var cartList = new HashMap<String, Cart>();
-        cart = new Cart();
+        var cartList = new HashMap<String, Cart>();
     }
 
     @Autowired
@@ -26,33 +24,33 @@ public class CartService {
         this.productServiceIntegration = productServiceIntegration;
     }
 
-    public Cart getCurrentCart() {
-//        Cart cart = (Cart) session.getAttribute("cart");
-//        if (cart == null) {
-//            cart = new Cart();
-//            session.setAttribute("cart", cart);
-//        }
+    public Cart getCurrentCart(String user) {
+        Cart cart = cartList.get(user);
+        if ( cart==null) {
+            cart = cartList.put(user, new Cart());
+        }
         return cart;
     }
 
-    public void resetCart() {
-        cart = new Cart();
+    public void resetCart(String user) {
+        cartList.remove(user);
     }
 
-    public void addToCart(Long productId) {
+    public void addToCart(Long productId, String user) {
         ProductDTO product = productServiceIntegration.getProductById(productId);
-        //Cart cart = getCurrentCart(session);
+        Cart cart = getCurrentCart(user);
         cart.add(product);
     }
 
-    public void removeFromCart(Long productId) {
+    public void removeFromCart(Long productId, String user) {
         ProductDTO product = productServiceIntegration.getProductById(productId);
-        //Cart cart = getCurrentCart(session);
+        Cart cart = getCurrentCart(user);
         cart.remove(product);
     }
 
-    public void changeQuantity(Long productId, Integer delta) {
+    public void changeQuantity(Long productId, Integer delta, String user) {
         ProductDTO product = productServiceIntegration.getProductById(productId);
+        Cart cart = getCurrentCart(user);
         cart.changeQuantity(product, delta);
     }
 

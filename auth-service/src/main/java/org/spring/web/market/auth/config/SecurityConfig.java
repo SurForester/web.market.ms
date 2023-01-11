@@ -29,6 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/products/**").hasRole("ADMIN")
 //                .antMatchers("/shop/order/**").authenticated()
 //                .antMatchers("/profile/**").authenticated()
+//                .antMatchers("/carts/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

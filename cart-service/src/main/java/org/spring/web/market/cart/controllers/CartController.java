@@ -8,6 +8,7 @@ import org.spring.web.market.cart.entities.Cart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -25,29 +26,29 @@ public class CartController {
     }
 
     @GetMapping("/add/{id}")
-    public void addToCart(@PathVariable("id") Long id) {
-        cartService.addToCart(id);
+    public void addToCart(@PathVariable("id") Long id, @RequestAttribute("user") String user) {
+        cartService.addToCart(id, user);
     }
 
     @GetMapping("/clear")
-    public void resetCart() {
-        cartService.resetCart();
+    public void resetCart(@RequestAttribute("user") String user) {
+        cartService.resetCart(user);
     }
 
     @GetMapping("/remove/{id}")
-    public void removeFromCart(@PathVariable("id") Long id) {
-        cartService.removeFromCart(id);
+    public void removeFromCart(@PathVariable("id") Long id, @RequestAttribute("user") String user) {
+        cartService.removeFromCart(id, user);
     }
 
     @GetMapping
     @ResponseBody
-    public CartDTO getCart() {
-        return cartConverter.modelCartToDTO(cartService.getCurrentCart());
+    public CartDTO getCart(@RequestAttribute("user") String user) {
+        return cartConverter.modelCartToDTO(cartService.getCurrentCart(user));
     }
 
     @GetMapping("/change_quantity")
-    public void changeQuantity(@RequestParam Long productId, @RequestParam Integer delta) {
-        cartService.changeQuantity(productId, delta);
+    public void changeQuantity(@RequestParam Long productId, @RequestParam Integer delta, @RequestAttribute("user") String user) {
+        cartService.changeQuantity(productId, delta, user);
     }
 
 }

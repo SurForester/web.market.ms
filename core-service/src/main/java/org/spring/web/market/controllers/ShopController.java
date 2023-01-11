@@ -3,12 +3,10 @@ package org.spring.web.market.controllers;
 import lombok.RequiredArgsConstructor;
 import org.spring.web.market.entities.Order;
 import org.spring.web.market.entities.Product;
-import org.spring.web.market.entities.User;
 import org.spring.web.market.integrations.CartServiceIntegration;
 import org.spring.web.market.repositories.specifications.ProductSpecs;
 import org.spring.web.market.services.OrderService;
 import org.spring.web.market.services.ProductService;
-import org.spring.web.market.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,7 +29,7 @@ public class ShopController {
     private int PAGE_SIZE = 10;
 
     //    private MailService mailService;
-    private UserService userService;
+    //private UserService userService;
     private OrderService orderService;
     private ProductService productService;
 
@@ -40,10 +38,10 @@ public class ShopController {
         this.productService = productService;
     }
 
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+//    @Autowired
+//    public void setUserService(UserService userService) {
+//        this.userService = userService;
+//    }
 
     @Autowired
     public void setOrderService(OrderService orderService) {
@@ -90,14 +88,13 @@ public class ShopController {
             PAGE_SIZE = lines;
         }
 
-            Page<Product> products = productService.getProductsWithPagingAndFiltering(currentPage, PAGE_SIZE, spec);
+        Page<Product> products = productService.getProductsWithPagingAndFiltering(
+                currentPage, PAGE_SIZE, spec);
 
         model.addAttribute("products", products.getContent());
         model.addAttribute("page", currentPage);
         model.addAttribute("totalPage", products.getTotalPages());
-
         model.addAttribute("filters", filters.toString());
-
         model.addAttribute("min", min);
         model.addAttribute("max", max);
         model.addAttribute("word", word);
@@ -106,11 +103,9 @@ public class ShopController {
         return "shop-page";
     }
 
-//    private final static String QUEUE_NAME = "hello";
-
     @GetMapping("/cart/add/{id}")
-    public void addProductToCart(@PathVariable("id") Long id, HttpServletRequest httpServletRequest) {
-        cartServiceIntegration.addProductToCart(httpServletRequest.getSession(), id);
+    public void addProductToCart(@PathVariable("id") Long id, Principal principal) {
+        cartServiceIntegration.addToCart(id, principal.getName());
     }
 
     @PostMapping("/order/confirm")
@@ -118,14 +113,15 @@ public class ShopController {
         if (principal == null) {
             return "redirect:/login";
         }
-        User user = userService.findByUserName(principal.getName());
-        Order order = orderService.makeOrder(cartServiceIntegration.getCart(httpServletRequest.getSession()), user);
-        cartServiceIntegration.clearCart(httpServletRequest.getSession());
+        Order order = orderService.makeOrder(
+                cartServiceIntegration.getCart(principal.getName()),
+                principal.getName());
         order.setDeliveryAddress(orderFromFrontend.getDeliveryAddress());
         order.setDeliveryDate(LocalDateTime.now().plusDays(7));
         order.setDeliveryPrice(BigDecimal.ZERO);
         order = orderService.saveOrder(order);
         model.addAttribute("order", order);
+        cartServiceIntegration.clearCart(principal.getName());
         return "order-filler";
     }
 
@@ -135,11 +131,11 @@ public class ShopController {
             return "redirect:/login";
         }
         // todo ждем до оплаты, проверка безопасности и проблема с повторной отправкой письма сделать одноразовый вход
-        User user = userService.findByUserName(principal.getName());
+//        User user = userService.findByUserName(principal.getName());
         Order confirmedOrder = orderService.findById(id);
-        if (!user.getId().equals(confirmedOrder.getUser().getId())) {
-            return "redirect:/";
-        }
+//        if (!user.getId().equals(confirmedOrder.getUser().getId())) {
+//            return "redirect:/";
+//        }
 //        mailService.sendOrderMail(confirmedOrder);
         model.addAttribute("order", confirmedOrder);
         return "order-result";

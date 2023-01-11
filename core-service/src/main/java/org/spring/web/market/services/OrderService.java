@@ -5,7 +5,6 @@ import org.spring.web.market.api.dto.CartItemDTO;
 import org.spring.web.market.converters.ProductDTOConverter;
 import org.spring.web.market.entities.Order;
 import org.spring.web.market.entities.OrderItem;
-import org.spring.web.market.entities.User;
 import org.spring.web.market.repositories.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,10 +35,10 @@ public class OrderService {
     }
 
     @Transactional
-    public Order makeOrder(CartDTO cart, User user) {
+    public Order makeOrder(CartDTO cart, String user) {
         var order = new Order();
         order.setId(0L);
-        order.setUser(user);
+        //order.setUser(user);
         order.setStatus(orderStatusService.getStatusById(1L));
         order.setPrice(cart.getTotalCost());
         var orderItems = new ArrayList<OrderItem>();
