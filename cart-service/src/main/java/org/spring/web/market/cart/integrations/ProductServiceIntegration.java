@@ -1,19 +1,26 @@
 package org.spring.web.market.cart.integrations;
 
 import lombok.RequiredArgsConstructor;
+import org.spring.web.market.api.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.spring.web.market.api.dto.ProductDTO;
-
-import java.util.Optional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
 public class ProductServiceIntegration {
-    private final RestTemplate restTemplate;
+    private final WebClient productServiceIntegrationProperties;
 
-    public Optional<ProductDTO> getProductById(Long id) {
-        return Optional.ofNullable(restTemplate.getForObject("http://localhost:8189/market/products/" + id, ProductDTO.class));
+    public ProductDTO getProductById(Long id) {
+        return productServiceIntegrationProperties.get()
+                .uri("products/" + id)
+                .retrieve()
+                .onStatus(HttpStatus -> HttpStatus.value() == HttpStatus.NOT_FOUND.value(),
+                        clientResponse -> Mono.error(new ResourceNotFoundException("Товар не найден в МС."))
+                )
+                .bodyToMono(ProductDTO.class)
+                .block();
     }
 
 }

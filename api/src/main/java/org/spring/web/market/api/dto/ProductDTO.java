@@ -1,11 +1,22 @@
 package org.spring.web.market.api.dto;
 
+import java.math.BigDecimal;
+
 public class ProductDTO {
 
     private Long id;
     private String title;
-    private Double price;
+    private BigDecimal price;
     private String categoryTitle;
+    private String path;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public Long getId() {
         return id;
@@ -23,11 +34,11 @@ public class ProductDTO {
         this.title = title;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
