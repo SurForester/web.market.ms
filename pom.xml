@@ -6,6 +6,8 @@
 		<module>api</module>
 		<module>cart-service</module>
 		<module>core-service</module>
+		<module>front-service</module>
+		<module>gateway</module>
 	</modules>
 
 	<modelVersion>4.0.0</modelVersion>
