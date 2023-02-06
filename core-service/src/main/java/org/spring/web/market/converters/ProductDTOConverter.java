@@ -15,13 +15,12 @@ public class ProductDTOConverter {
     }
 
     public ProductDTO modelProductItemToDTO(Product product) {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(product.getId());
-        productDTO.setPrice(product.getPrice());
-        productDTO.setTitle(product.getTitle());
-        productDTO.setPath(product.getImages().get(0).getPath());
-        productDTO.setCategoryTitle(productDTO.getCategoryTitle());
-        return productDTO;
+        return ProductDTO.newBuilder()
+                .withId(product.getId())
+                .withPrice(product.getPrice())
+                .withTitle(product.getTitle())
+                .withPath(product.getImages().get(0).getPath())
+                .build();
     }
 
 }

@@ -1,14 +1,11 @@
 package org.spring.web.market.auth.entities;
 
-import lombok.Data;
-
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 @Entity
-@Data
 @Table(name = "users")
 public class User {
     @Id
@@ -51,28 +48,50 @@ public class User {
     public User() {
     }
 
-    public User(String userName, String password, String firstName, String lastName, String email) {
-        this.userName = userName;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-    }
-
-    public User(String userName, String password, String firstName, String lastName, String email,
-                Collection<Role> roles) {
-        this.userName = userName;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.roles = roles;
-    }
-
     @Override
     public String toString() {
         return "User{" + "id=" + id + ", userName='" + userName + '\'' + ", password='" + "*********" + '\''
                 + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", email='" + email + '\''
                 + ", roles=" + roles + '}';
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setRoles(Collection<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Collection<Role> getRoles() {
+        return roles;
     }
 }

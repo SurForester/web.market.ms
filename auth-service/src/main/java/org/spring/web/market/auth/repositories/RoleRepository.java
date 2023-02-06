@@ -1,6 +1,6 @@
 package org.spring.web.market.auth.repositories;
 
-import org.spring.web.market.entities.Role;
+import org.spring.web.market.auth.entities.Role;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
