@@ -1,6 +1,7 @@
 package org.spring.web.market.entities;
 
 import lombok.Data;
+import org.springframework.security.core.userdetails.User;
 
 import javax.persistence.*;
 
@@ -13,9 +14,8 @@ public class DeliveryAddress {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long user;
 
     @Column(name = "address")
     private String address;

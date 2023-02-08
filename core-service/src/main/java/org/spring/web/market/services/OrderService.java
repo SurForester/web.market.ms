@@ -2,9 +2,9 @@ package org.spring.web.market.services;
 
 import org.spring.web.market.api.dto.CartDTO;
 import org.spring.web.market.api.dto.CartItemDTO;
+import org.spring.web.market.converters.ProductDTOConverter;
 import org.spring.web.market.entities.Order;
 import org.spring.web.market.entities.OrderItem;
-import org.spring.web.market.entities.User;
 import org.spring.web.market.repositories.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +16,13 @@ import java.util.List;
 @Service
 public class OrderService {
     private OrderRepository orderRepository;
-
     private OrderStatusService orderStatusService;
+    private ProductDTOConverter productDTOConverter;
+
+    @Autowired
+    public void setProductFromDTOConverter(ProductDTOConverter productDTOConverter) {
+        this.productDTOConverter = productDTOConverter;
+    }
 
     @Autowired
     public void setOrderRepository(OrderRepository orderRepository) {
@@ -30,13 +35,23 @@ public class OrderService {
     }
 
     @Transactional
-    public Order makeOrder(CartDTO cart, User user) {
+    public Order makeOrder(CartDTO cart, String user) {
         var order = new Order();
         order.setId(0L);
-        order.setUser(user);
+        //order.setUser(user);
         order.setStatus(orderStatusService.getStatusById(1L));
         order.setPrice(cart.getTotalCost());
-        order.setOrderItems(new ArrayList<>(cart.getItems()));
+        var orderItems = new ArrayList<OrderItem>();
+        for (CartItemDTO cartItemDto : cart.getItems()) {
+            var oi = new OrderItem();
+            oi.setOrder(order);
+            oi.setId(cartItemDto.getId());
+            oi.setProduct(productDTOConverter.modelProductDTOToItem(cartItemDto.getProduct()));
+            oi.setQuantity(cartItemDto.getQuantity());
+            oi.setItemPrice(cartItemDto.getItemPrice());
+            oi.setTotalPrice(cartItemDto.getTotalPrice());
+        }
+        order.setOrderItems(orderItems);
         return order;
     }
 
