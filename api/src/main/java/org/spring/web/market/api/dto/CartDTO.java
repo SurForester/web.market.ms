@@ -1,10 +1,11 @@
 package org.spring.web.market.api.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class CartDTO {
     private List<CartItemDTO> items;
-    private Double totalCost;
+    private BigDecimal totalCost;
 
     public List<CartItemDTO> getItems() {
         return items;
@@ -14,11 +15,11 @@ public class CartDTO {
         this.items = items;
     }
 
-    public Double getTotalCost() {
+    public BigDecimal getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(Double totalCost) {
+    public void setTotalCost(BigDecimal totalCost) {
         this.totalCost = totalCost;
     }
 }
