@@ -3,6 +3,8 @@ package org.spring.web.market.entities;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.mapstruct.Mapper;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -15,6 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "products")
 @Data
+@RedisHash
 public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
