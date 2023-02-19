@@ -3,10 +3,13 @@ package org.spring.web.market.entities;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.mapstruct.Mapper;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "products")
 @Data
+@RedisHash
 public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +53,7 @@ public class Product implements Serializable {
     @NotNull(message = "не может быть пустым")
     @DecimalMin(value = "0.01", message = "минимальное значение 0")
     @Digits(integer = 10, fraction = 2)
-    private double price;
+    private BigDecimal price;
 
     @Column(name = "create_at")
     @CreationTimestamp
